@@ -7,6 +7,6 @@ namespace Ecommerce_2023.Models.Role
         public RoleContext(DbContextOptions options) : base(options)
         {
         }
-        public DbSet<Role> Roles { get; set; }                    
+        public DbSet<RoleEntity> Roles { get; set; }                    
     }
 }

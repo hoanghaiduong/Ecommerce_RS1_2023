@@ -1,5 +1,8 @@
-﻿using Ecommerce_2023.Models.Role;
+﻿using Ecommerce_2023.Models.Interfaces;
+using Ecommerce_2023.Models.Role;
 using Ecommerce_2023.Models.Roles.DTO;
+using Ecommerce_2023.Services;
+using Ecommerce_2023.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,116 +14,155 @@ namespace Ecommerce_2023.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private readonly ILogger<RoleController> _logger;
-        private readonly RoleContext _dbContext;
-        public RoleController(RoleContext dbContext) {
-            _dbContext = dbContext;
-        }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Role>>> GetRoles()
+        private readonly RoleService roleService;
+
+        public RoleController(RoleService roleService)
         {
-            if(_dbContext.Roles==null)
-            {
-                return NotFound(new
-                {
-                    Message="Không tìm thấy bất kì dữ liệu nào",
-                    StatusCode=HttpStatusCode.NotFound
-                });
-            }    
-            return await _dbContext.Roles.ToListAsync();
+            this.roleService = roleService;
         }
+
         [HttpGet]
-        [Route("getById")]
-        public async Task<ActionResult<Role>> GetRole([FromQuery] int id)
+        public async Task<ActionResult<List<RoleEntity>>> GetEmployeesList()
         {
-            if (_dbContext.Roles == null)
-            {
-                return NotFound(new
-                {
-                    Message = "Không tìm thấy bất kì dữ liệu nào",
-                    StatusCode = HttpStatusCode.NotFound
-                });
-            }
-            var role = await _dbContext.Roles.FindAsync(id);
-            if (role==null)
+            var roles = await roleService.GetEmployeesListAsync();
+            return Ok(roles);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<RoleEntity>> GetRoleById(int id)
+        {
+            var role = await roleService.GetRoleByIdAsync(id);
+            if (role == null)
             {
                 return NotFound();
             }
-            return role;
+            return Ok(role);
         }
 
         [HttpPost]
-        [Route("create")]
-        public async Task<ActionResult<Role>> CreateRole([FromBody] Role role)
+        public async Task<ActionResult<ResponseModel>> SaveRole(RoleEntity roleEntity)
         {
-           _dbContext.Roles.Add(role);
-            await _dbContext.SaveChangesAsync();
-            return CreatedAtAction(nameof(CreateRole), new {id=role.Id},role);
+            var response = await roleService.SaveRoleAsync(roleEntity);
+            return Ok(response);
         }
 
-        [HttpPut]
-        [Route("update")]
-        public async Task<ActionResult<Role>> UpdateRole([FromQuery] int id, [FromBody] RoleDTO role)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ResponseModel>> DeleteRole(int id)
         {
-          
-
-            var existingRole = await _dbContext.Roles.FindAsync(id);
-            if (existingRole == null)
-            {
-                return NotFound("Id in the query parameters does not match the Id in the Role object");
-            }
-          
-           _dbContext.Entry(existingRole).CurrentValues.SetValues(role);
-
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                throw new Exception("An error occurred while updating the Role", ex);
-            }
-
-            return Ok(new
-            {
-                message=$"Update data with id :{id} successfully",
-                data=existingRole
-            });
+            var response = await roleService.DeleteRoleAsync(id);
+            return Ok(response);
         }
+        //private readonly ILogger<RoleController> _logger;
+        //private readonly RoleContext _dbContext;
+        //public RoleController(RoleContext dbContext, ILogger<RoleController> logger)
+        //{
+        //    _dbContext = dbContext;
+        //    _logger = logger;
+        //}
 
-        private bool CheckRoleExists(int id)
-        {
-            return (_dbContext.Roles?.Any(r => r.Id == id)).GetValueOrDefault();
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<RoleEntity>>> GetRoles()
+        //{
+        //    if (_dbContext.Roles == null)
+        //    {
+        //        return NotFound(new
+        //        {
+        //            Message = "Không tìm thấy bất kì dữ liệu nào",
+        //            StatusCode = HttpStatusCode.NotFound
+        //        });
+        //    }
+        //    return await _dbContext.Roles.ToListAsync();
+        //}
+        //[HttpGet]
+        //[Route("getById")]
+        //public async Task<ActionResult<RoleEntity>> GetRole([FromQuery] int id)
+        //{
+        //    if (_dbContext.Roles == null)
+        //    {
+        //        return NotFound(new
+        //        {
+        //            Message = "Không tìm thấy bất kì dữ liệu nào",
+        //            StatusCode = HttpStatusCode.NotFound
+        //        });
+        //    }
+        //    var role = await _dbContext.Roles.FindAsync(id);
+        //    if (role == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return role;
+        //}
 
-        [HttpDelete]
-        [Route("delete")]
-        public async Task<ActionResult> DeleteRole([FromQuery] int id)
-        {
+        //[HttpPost]
+        //[Route("create")]
+        //public async Task<ActionResult<RoleEntity>> CreateRole([FromBody] RoleEntity role)
+        //{
+        //    _dbContext.Roles.Add(role);
+        //    await _dbContext.SaveChangesAsync();
+        //    return CreatedAtAction(nameof(CreateRole), new { id = role.Id }, role);
+        //}
+
+        //[HttpPut]
+        //[Route("update")]
+        //public async Task<ActionResult<RoleEntity>> UpdateRole([FromQuery] int id, [FromBody] RoleDTO role)
+        //{
+        //    var existingRole = await _dbContext.Roles.FindAsync(id);
+        //    if (existingRole == null)
+        //    {
+        //        return NotFound("Id in the query parameters does not match the Id in the Role object");
+        //    }
+
+        //    _dbContext.Entry(existingRole).CurrentValues.SetValues(role);
+
+        //    try
+        //    {
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        throw new Exception("An error occurred while updating the Role", ex);
+        //    }
+
+        //    return Ok(new
+        //    {
+        //        message = $"Update data with id :{id} successfully",
+        //        data = existingRole
+        //    });
+        //}
+
+        //private bool CheckRoleExists(int id)
+        //{
+        //    return (_dbContext.Roles?.Any(r => r.Id == id)).GetValueOrDefault();
+        //}
+
+        //[HttpDelete]
+        //[Route("delete")]
+        //public async Task<ActionResult> DeleteRole([FromQuery] int id)
+        //{
 
 
-            var existingRole = await _dbContext.Roles.FindAsync(id);
-            if (existingRole == null)
-            {
-                return NotFound("Id in the query parameters does not match the Id in the Role object");
-            }
+        //    var existingRole = await _dbContext.Roles.FindAsync(id);
+        //    if (existingRole == null)
+        //    {
+        //        return NotFound("Id in the query parameters does not match the Id in the Role object");
+        //    }
 
-            _dbContext.Remove(existingRole);
+        //    _dbContext.Remove(existingRole);
 
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                throw new Exception("An error occurred while updating the Role", ex);
-            }
+        //    try
+        //    {
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        throw new Exception("An error occurred while updating the Role", ex);
+        //    }
 
-            return Ok(new
-            {
-                message = $"Delete data with id :{id} successfully",
-               
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        message = $"Delete data with id :{id} successfully",
+
+        //    });
+        //}
     }
 }
