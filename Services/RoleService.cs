@@ -1,9 +1,12 @@
 ﻿using Ecommerce_2023.Models.Interfaces;
 using Ecommerce_2023.Models.Role;
+using Ecommerce_2023.Models.Roles.DTO;
 using Ecommerce_2023.Shared;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,12 +50,36 @@ namespace Ecommerce_2023.Services
             return await roleContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
         }
 
-        public async Task<ResponseModel> SaveRoleAsync(RoleEntity roleEntity)
+        public async Task<ActionResult<ResponseModel>> SaveRoleAsync(RoleDTO roleDTO, int? id = null)
         {
-            roleContext.Roles.Add(roleEntity);
-            await roleContext.SaveChangesAsync();
+            RoleEntity role;
+            if (id == null)
+            {
+                role = new RoleEntity
+                {
+                    Name = roleDTO.Name,
+                    IsActive = roleDTO.IsActive
+                };
+                roleContext.Roles.Add(role);
+            }
+            else
+            {
+               role = await GetRoleByIdAsync(id.Value);
+                if (role != null)
+                {
+                    role.Name = roleDTO.Name;
+                    role.IsActive = roleDTO.IsActive;
+                    // Update other properties as needed
+                }
+            }    
+              
+                await roleContext.SaveChangesAsync();
 
-            return new ResponseModel { Status = true, Message = "Role saved successfully" };
+                return new ResponseModel { Status = true, Message = "Role saved successfully", Result = role };
         }
+        //private ResponseModel CreatedAtActionResult(string v, object value, RoleEntity role)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

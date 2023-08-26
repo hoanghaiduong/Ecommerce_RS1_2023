@@ -15,20 +15,22 @@ namespace Ecommerce_2023.Controllers
     public class RoleController : ControllerBase
     {
         private readonly RoleService roleService;
+        private readonly ILogger<RoleController> _logger;
 
-        public RoleController(RoleService roleService)
+        public RoleController(RoleService roleService , ILogger<RoleController> logger)
         {
             this.roleService = roleService;
+           _logger = logger;   
         }
 
-        [HttpGet]
+        [HttpGet("gets")]
         public async Task<ActionResult<List<RoleEntity>>> GetEmployeesList()
         {
             var roles = await roleService.GetEmployeesListAsync();
             return Ok(roles);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get")]
         public async Task<ActionResult<RoleEntity>> GetRoleById(int id)
         {
             var role = await roleService.GetRoleByIdAsync(id);
@@ -39,19 +41,40 @@ namespace Ecommerce_2023.Controllers
             return Ok(role);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ResponseModel>> SaveRole(RoleEntity roleEntity)
+        [HttpPost("create")]
+        public async Task<ActionResult<ResponseModel>> SaveRole([FromBody] RoleDTO role)
         {
-            var response = await roleService.SaveRoleAsync(roleEntity);
-            return Ok(response);
+            try
+            {
+                return await roleService.SaveRoleAsync(role);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return NotFound(ex.Message);
+                
+            }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<ResponseModel>> DeleteRole(int id)
+        [HttpPost("update")]
+        public async Task<ActionResult<ResponseModel>> UpdateRole([FromQuery] int id,[FromBody] RoleDTO role)
+        {
+            try
+            {
+                return await roleService.SaveRoleAsync(role,id);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return NotFound(ex.Message);
+
+            }
+        }
+        [HttpDelete("delete")]
+        public async Task<ActionResult<ResponseModel>> DeleteRole([FromQuery] int id)
         {
             var response = await roleService.DeleteRoleAsync(id);
             return Ok(response);
         }
+
         //private readonly ILogger<RoleController> _logger;
         //private readonly RoleContext _dbContext;
         //public RoleController(RoleContext dbContext, ILogger<RoleController> logger)
