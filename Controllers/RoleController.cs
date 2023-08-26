@@ -6,6 +6,7 @@ using Ecommerce_2023.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 using System.Net;
 
 namespace Ecommerce_2023.Controllers
@@ -26,8 +27,15 @@ namespace Ecommerce_2023.Controllers
         [HttpGet("gets")]
         public async Task<ActionResult<List<RoleEntity>>> GetEmployeesList()
         {
-            var roles = await roleService.GetEmployeesListAsync();
-            return Ok(roles);
+            try
+            {
+                var roles = await roleService.GetEmployeesListAsync();
+                return Ok(roles);
+            }
+            catch (DbException ex)
+            {
+               return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("get")]

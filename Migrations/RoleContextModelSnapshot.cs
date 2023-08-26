@@ -22,7 +22,7 @@ namespace Ecommerce_2023.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Ecommerce_2023.Models.Role.Role", b =>
+            modelBuilder.Entity("Ecommerce_2023.Models.Role.RoleEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce_2023.Migrations
 {
     [DbContext(typeof(RoleContext))]
-    [Migration("20230825152010_Initial")]
+    [Migration("20230826113125_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace Ecommerce_2023.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Ecommerce_2023.Models.Role.Role", b =>
+            modelBuilder.Entity("Ecommerce_2023.Models.Role.RoleEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
