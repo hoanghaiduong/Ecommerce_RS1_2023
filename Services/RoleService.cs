@@ -1,6 +1,6 @@
-﻿using Ecommerce_2023.Models.Interfaces;
-using Ecommerce_2023.Models.Role;
-using Ecommerce_2023.Models.Roles.DTO;
+﻿using Ecommerce_2023.Models;
+using Ecommerce_2023.Models.DTO;
+using Ecommerce_2023.Models.Interfaces;
 using Ecommerce_2023.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,53 +14,53 @@ namespace Ecommerce_2023.Services
 {
     public class RoleService : IRoleService
     {
-        private readonly RoleContext roleContext;
+        private readonly DatabaseContext _db;
 
-        public RoleService(RoleContext context)
+        public RoleService(DatabaseContext context)
         {
-            roleContext = context;
+            _db = context;
         }
 
         public async Task<ResponseModel> DeleteRoleAsync(int id)
         {
-            var role = await roleContext.Roles.FindAsync(id);
+            var role = await _db.Roles.FindAsync(id);
             if (role == null)
             {
                 return new ResponseModel { Status = false, Message = "Role not found" };
             }
 
-            roleContext.Roles.Remove(role);
-            await roleContext.SaveChangesAsync();
+            _db.Roles.Remove(role);
+            await _db.SaveChangesAsync();
 
             return new ResponseModel { Status = true, Message = $"Role with id: {id} deleted successfully" };
         }
 
-        public async Task<List<RoleEntity>> GetEmployeesListAsync()
+        public async Task<List<Role>> GetEmployeesListAsync()
         {
-            return await roleContext.Roles.ToListAsync();
+            return await _db.Roles.ToListAsync();
         }
 
-        public async Task<RoleEntity> GetRoleByIdAsync(int id)
+        public async Task<Role> GetRoleByIdAsync(int id)
         {
-            return await roleContext.Roles.FindAsync(id);
+            return await _db.Roles.FindAsync(id);
         }
 
-        public async Task<RoleEntity> GetRoleByNameAsync(string roleName)
+        public async Task<Role> GetRoleByNameAsync(string roleName)
         {
-            return await roleContext.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+            return await _db.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
         }
 
         public async Task<ActionResult<ResponseModel>> SaveRoleAsync(RoleDTO roleDTO, int? id = null)
         {
-            RoleEntity role;
+            Role role;
             if (id == null)
             {
-                role = new RoleEntity
+                role = new Role()
                 {
                     Name = roleDTO.Name,
                     IsActive = roleDTO.IsActive
                 };
-                roleContext.Roles.Add(role);
+                _db.Roles.Add(role);
             }
             else
             {
@@ -73,7 +73,7 @@ namespace Ecommerce_2023.Services
                 }
             }    
               
-                await roleContext.SaveChangesAsync();
+                await _db.SaveChangesAsync();
 
                 return new ResponseModel { Status = true, Message = "Role saved successfully", Result = role };
         }

@@ -10,7 +10,12 @@
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            return configuration.GetSection("ConnectionStrings")["connectionStr_ecommerce_rs1"];
+            return configuration.GetSection("ConnectionStrings")["DefaultConnection"];
+        }
+        public static DateTime GetCurrentDate()
+        {
+            return DateTime.Now;
         }
     }
 }
+    

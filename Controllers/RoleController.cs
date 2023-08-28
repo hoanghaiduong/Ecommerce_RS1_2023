@@ -1,6 +1,5 @@
-﻿using Ecommerce_2023.Models.Interfaces;
-using Ecommerce_2023.Models.Role;
-using Ecommerce_2023.Models.Roles.DTO;
+﻿using Ecommerce_2023.Models;
+using Ecommerce_2023.Models.DTO;
 using Ecommerce_2023.Services;
 using Ecommerce_2023.Shared;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +24,7 @@ namespace Ecommerce_2023.Controllers
         }
 
         [HttpGet("gets")]
-        public async Task<ActionResult<List<RoleEntity>>> GetEmployeesList()
+        public async Task<ActionResult<List<Role>>> GetEmployeesList()
         {
             try
             {
@@ -39,7 +38,7 @@ namespace Ecommerce_2023.Controllers
         }
 
         [HttpGet("get")]
-        public async Task<ActionResult<RoleEntity>> GetRoleById(int id)
+        public async Task<ActionResult<Role>> GetRoleById(int id)
         {
             var role = await roleService.GetRoleByIdAsync(id);
             if (role == null)
