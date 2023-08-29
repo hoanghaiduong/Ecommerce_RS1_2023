@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Ecommerce_2023.Models;
 
@@ -29,7 +28,26 @@ public partial class DatabaseContext : DbContext
     {
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).HasDefaultValue(Guid.NewGuid().ToString());
+            entity.HasData(
+                new Role
+                {
+                  Id = Guid.NewGuid().ToString(),
+                    Name = "ADMIN",
+                    IsActive = true,
+                }, new Role
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "USER",
+                    IsActive = true,
+                } ,new Role
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "RESTAUNRANT",
+                    IsActive = true,
+                }
+
+            );
         });
 
         modelBuilder.Entity<User>(entity =>

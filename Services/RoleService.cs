@@ -21,7 +21,7 @@ namespace Ecommerce_2023.Services
             _db = context;
         }
 
-        public async Task<ResponseModel> DeleteRoleAsync(int id)
+        public async Task<ResponseModel> DeleteRoleAsync(Guid id)
         {
             var role = await _db.Roles.FindAsync(id);
             if (role == null)
@@ -40,7 +40,7 @@ namespace Ecommerce_2023.Services
             return await _db.Roles.ToListAsync();
         }
 
-        public async Task<Role> GetRoleByIdAsync(int id)
+        public async Task<Role> GetRoleByIdAsync(string id)
         {
             return await _db.Roles.FindAsync(id);
         }
@@ -50,13 +50,14 @@ namespace Ecommerce_2023.Services
             return await _db.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
         }
 
-        public async Task<ActionResult<ResponseModel>> SaveRoleAsync(RoleDTO roleDTO, int? id = null)
+        public async Task<ActionResult<ResponseModel>> SaveRoleAsync(RoleDTO roleDTO, string? id = null)
         {
             Role role;
             if (id == null)
             {
                 role = new Role()
                 {
+                    Id= Guid.NewGuid().ToString(),
                     Name = roleDTO.Name,
                     IsActive = roleDTO.IsActive
                 };
@@ -64,7 +65,7 @@ namespace Ecommerce_2023.Services
             }
             else
             {
-               role = await GetRoleByIdAsync(id.Value);
+               role = await GetRoleByIdAsync(id);
                 if (role != null)
                 {
                     role.Name = roleDTO.Name;

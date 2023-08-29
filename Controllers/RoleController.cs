@@ -38,7 +38,7 @@ namespace Ecommerce_2023.Controllers
         }
 
         [HttpGet("get")]
-        public async Task<ActionResult<Role>> GetRoleById(int id)
+        public async Task<ActionResult<Role>> GetRoleById(string id)
         {
             var role = await roleService.GetRoleByIdAsync(id);
             if (role == null)
@@ -63,7 +63,7 @@ namespace Ecommerce_2023.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<ActionResult<ResponseModel>> UpdateRole([FromQuery] int id,[FromBody] RoleDTO role)
+        public async Task<ActionResult<ResponseModel>> UpdateRole([FromQuery] string id,[FromBody] RoleDTO role)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Ecommerce_2023.Controllers
             }
         }
         [HttpDelete("delete")]
-        public async Task<ActionResult<ResponseModel>> DeleteRole([FromQuery] int id)
+        public async Task<ActionResult<ResponseModel>> DeleteRole([FromQuery] Guid id)
         {
             var response = await roleService.DeleteRoleAsync(id);
             return Ok(response);
